@@ -172,9 +172,6 @@ def main(concept_filenames, document_filenames):
 
   result_df = merge_dfs(annotation_df, notes_df)
 
-  label_encoder = preprocessing.LabelEncoder()
-  result_df["label"] = label_encoder.fit_transform(result_df["NER_tag"])
-
   return result_df
 
 if __name__ == "__main__":

@@ -1,3 +1,16 @@
+from transformers import BertTokenizer
+
 CONCEPT_FILES_PATH = "../input/concepts"
 DOCUMENT_FILES_PATH = "../input/docs"
-TRAIN_DF = "../input/train/train.csv"
+
+TRAIN_FILE = "../input/train/train.csv"
+MODEL_FILE = "../models/model.bin"
+
+MAX_LEN = 128
+TOKENIZER = BertTokenizer.from_pretrained(
+    "bert-base-uncased",
+    do_lower=True
+)
+
+BATCH_SIZE = 8
+EPOCHS = 3
