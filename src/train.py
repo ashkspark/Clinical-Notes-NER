@@ -1,5 +1,6 @@
 import config
 import torch
+import joblib
 
 import pandas as pd
 import numpy as np
@@ -9,6 +10,7 @@ from model import EntityModel
 from engine import *
 
 from sklearn import preprocessing
+from sklearn import model_selection
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
@@ -36,7 +38,7 @@ def get_optimizer(model):
 
 def get_scheduler(num_samples, optimizer):
 
-    num_train_steps = int(num_samples / config.EPOCHS * config.BATCH_SIZE)
+    num_train_steps = int(num_samples / config.EPOCHS * config.TRAIN_BATCH_SIZE)
 
     return get_linear_schedule_with_warmup(
         optimizer = optimizer,
@@ -49,38 +51,58 @@ def train(df):
     ##################### STAGE 1 #####################
     label_enc = preprocessing.LabelEncoder()
     df["label"] = label_enc.fit_transform(df["NER_tag"].values)
+    meta_data = {"label_enc": label_enc}
+
+    joblib.dump(meta_data, config.META_DATA_FILE)
+
+    ##################### STAGE 2 #####################
 
     sentences = list(df.groupby("id")["word"].apply(list).values)
     labels = list(df.groupby("id")["label"].apply(list).values)
 
-    train_dataset = EntityDataset(sentences, labels)
+    ##################### STAGE 3 #####################
+
+    train_sentences, valid_sentences, train_labels, valid_labels = model_selection.train_test_split(sentences, labels)
+
+    ##################### STAGE 4 #####################
+
+    train_dataset = EntityDataset(train_sentences, train_labels)
+    valid_dataset = EntityDataset(valid_sentences, valid_labels)
 
     train_data_loader = torch.utils.data.DataLoader(
         dataset = train_dataset,
-        batch_size = config.BATCH_SIZE
+        batch_size = config.TRAIN_BATCH_SIZE
     )
 
-    ##################### STAGE 2 #####################
-    num_tags = df["label"].nunique()
+    valid_data_loader = torch.utils.data.DataLoader(
+        dataset = valid_dataset,
+        batch_size = config.VALID_BATCH_SIZE
+    )
+
+    ##################### STAGE 5 #####################
+    num_tags = len(label_enc.classes_)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     entity_model = EntityModel(num_tags).to(device)
     optimizer = get_optimizer(entity_model)
-    scheduler = get_scheduler(df.shape[0], optimizer)
+    scheduler = get_scheduler(len(train_dataset), optimizer)
 
-    ##################### STAGE 2 #####################
+    ##################### STAGE 6 #####################
     best_loss = np.inf
     training_loss = []
+    validation_loss = []
     for epoch in range(config.EPOCHS):
         print(f"Epoch# {epoch+1}...")
-        total_loss = train_one_epoch(entity_model, train_data_loader, optimizer, device, scheduler)
 
-        print(f"\n loss: {round(total_loss, 5)}")
-        training_loss.append(total_loss)
+        train_loss = train_one_epoch(entity_model, train_data_loader, optimizer, device, scheduler)
+        training_loss.append(train_loss)
 
-        if total_loss < best_loss:
-            best_loss = total_loss
-            torch.save(entity_model.state_dict(), config.MODEL_FILE)
-            
+        valid_loss = validate_one_epoch(entity_model, valid_data_loader, device)
+        validation_loss.append(valid_loss)
+        print(f"Validation loss: {round(valid_loss, 5)}")
+
+        if valid_loss < best_loss:
+            best_loss = valid_loss
+            torch.save(entity_model.state_dict(), config.MODEL_FILE)  
 
 if __name__ == "__main__":
     main_df = pd.read_csv(config.TRAIN_FILE, na_filter=False)
