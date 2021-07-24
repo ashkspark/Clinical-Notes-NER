@@ -48,14 +48,14 @@ def create_ids(concept_filenames, document_filenames):
   return concept_ids, document_ids
 
 
-def create_corpus_lists(file_ids):
+def create_corpus_lists(file_ids, concept_file_path, document_file_path):
   # Create corpus lists (each list of lists for document corpus and concept corpus ordered by document ids)
   document_corpus = []
   concept_corpus = []
 
   for fid in tqdm(file_ids):
-    concept_filepath = f"{config.CONCEPT_FILES_PATH}/clinical-{fid}.txt.con"
-    document_filepath = f"{config.DOCUMENT_FILES_PATH}/clinical-{fid}.txt"
+    concept_filepath = f"{concept_file_path}/clinical-{fid}.txt.con"
+    document_filepath = f"{document_file_path}/clinical-{fid}.txt"
 
     with open(concept_filepath, "r") as f:
       text = f.read().strip().splitlines()
@@ -114,7 +114,6 @@ def create_notes_df(document_corpus, concept_ids):
   temp_list = []
 
   for ind, document in tqdm(enumerate(document_corpus)):
-
     for row_ind, row in enumerate(document):
       row_split = row.split(" ")
       for word_ind, word in enumerate(row_split):
@@ -152,7 +151,7 @@ def merge_dfs(annotation_df, notes_df):
 
   return result_df
 
-def main(concept_filenames, document_filenames):
+def main(concept_filenames, document_filenames, concept_file_path, document_file_path):
 
   # Print tag distribution
   print("Printing tag distribution...")
@@ -162,7 +161,7 @@ def main(concept_filenames, document_filenames):
   concept_ids, document_ids = create_ids(concept_filenames, document_filenames)
 
   # Create corpus lists
-  concept_corpus, document_corpus = create_corpus_lists(concept_ids)
+  concept_corpus, document_corpus = create_corpus_lists(concept_ids, concept_file_path, document_file_path)
 
   # Create annotation dataframe
   annotation_df = create_annotation_df(concept_corpus, concept_ids)
@@ -176,10 +175,20 @@ def main(concept_filenames, document_filenames):
 
 if __name__ == "__main__":
 
-  # Send lists of document and concept filenames
-  main_df = main(
-    glob.glob(f"{config.CONCEPT_FILES_PATH}/*.txt.con"),
-    glob.glob(f"{config.DOCUMENT_FILES_PATH}/*.txt")
-  )
+  concept_file_paths = [config.CONCEPT_FILES_PATH_BI, config.CONCEPT_FILES_PATH_PA]
+  document_file_paths = [config.DOCUMENT_FILES_PATH_BI, config.DOCUMENT_FILES_PATH_PA]
+  dfs = []
+  for CONCEPT_FILES_PATH, DOCUMENT_FILES_PATH in zip(concept_file_paths, document_file_paths):
 
-  main_df.to_csv(config.TRAIN_DF, index=False)
+    # Send lists of document and concept filenames
+    df = main(
+      glob.glob(f"{CONCEPT_FILES_PATH}/*.txt.con"),
+      glob.glob(f"{DOCUMENT_FILES_PATH}/*.txt"),
+      CONCEPT_FILES_PATH,
+      DOCUMENT_FILES_PATH
+    )
+
+    dfs.append(df)
+
+  main_df = pd.concat(dfs, ignore_index=True)
+  main_df.to_csv(config.TRAIN_FILE, index=False)

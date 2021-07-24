@@ -57,8 +57,14 @@ def train(df):
 
     ##################### STAGE 2 #####################
 
-    sentences = list(df.groupby("id")["word"].apply(list).values)
-    labels = list(df.groupby("id")["label"].apply(list).values)
+    #sentences = list(df.groupby("id")["word"].apply(list).values)
+    #labels = list(df.groupby("id")["label"].apply(list).values)
+
+    sentences = []
+    labels = []
+    for start_ind in range(0,df.shape[0],50):
+        sentences.append(list(df.iloc[start_ind:start_ind+50]["word"].values))
+        labels.append(list(df.iloc[start_ind:start_ind+50]["label"].values))
 
     ##################### STAGE 3 #####################
 
@@ -88,6 +94,8 @@ def train(df):
 
     ##################### STAGE 6 #####################
     best_loss = np.inf
+    waiting = 0
+    
     training_loss = []
     validation_loss = []
     for epoch in range(config.EPOCHS):
@@ -100,9 +108,18 @@ def train(df):
         validation_loss.append(valid_loss)
         print(f"Validation loss: {round(valid_loss, 5)}")
 
-        if valid_loss < best_loss:
+        if valid_loss<best_loss:
             best_loss = valid_loss
-            torch.save(entity_model.state_dict(), config.MODEL_FILE)  
+            torch.save(entity_model.state_dict(), config.MODEL_FILE)
+
+        else:
+            waiting+=1
+            if waiting==config.MAX_WAITING:
+                print("======"*20)
+                print(f"Best loss: {round(best_loss, 5)}")
+                print("======"*20)
+                break
+
 
 if __name__ == "__main__":
     main_df = pd.read_csv(config.TRAIN_FILE, na_filter=False)
