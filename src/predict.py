@@ -5,7 +5,7 @@ import config
 import dataset
 import model
 
-from prettytable import PrettyTable
+from termcolor import colored
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -65,15 +65,32 @@ if __name__ == "__main__":
     for sentence_batch in chunks(sentence_tokens, 50):
         batch_tokens, batch_labels = predict(sentence_batch)
 
-    for token, label in zip(batch_tokens, batch_labels):
-        if not token in ["[PAD]", "[CLS]", "[SEP]"]:
-            tokens.append(token)
-            labels.append(label)
+        for token, label in zip(batch_tokens, batch_labels):
+            if not token in ["[PAD]", "[CLS]", "[SEP]"]:
+                tokens.append(token)
+                labels.append(label)
 
-    print("\nPrediction:\n")
-    table = PrettyTable()
-    table.field_names = ["Token", "Tag"]
-    for token, tag in zip(tokens, labels):
-        table.add_row([token, tag])
+    print("\n----------Your text with the highlighted entities----------\n")
 
-    print(table)
+    for ind in range(len(tokens)):
+        if labels[ind]!="O":
+            label_type = labels[ind].split("-")[1]
+
+            if label_type == "problem":
+                tokens[ind] = colored(tokens[ind], "red")
+
+            elif label_type == "treatment":
+                tokens[ind] = colored(tokens[ind], "blue")
+
+            elif label_type == "test":
+                tokens[ind] = colored(tokens[ind], "green")
+
+            elif label_type == "person":
+                tokens[ind] = colored(tokens[ind], "yellow")
+
+            else:
+                tokens[ind] = colored(tokens[ind], "magenta")
+
+    print(" ".join(tokens))
+
+    print("\n-----------------------------------------------------------\n")
