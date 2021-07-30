@@ -62,7 +62,7 @@ def train(df):
 
     sentences = []
     labels = []
-    for start_ind in range(0,df.shape[0],50):
+    for start_ind in range(0,df.shape[0], config.TRAIN_CHUNK_SIZE):
         sentences.append(list(df.iloc[start_ind:start_ind+50]["word"].values))
         labels.append(list(df.iloc[start_ind:start_ind+50]["label"].values))
 

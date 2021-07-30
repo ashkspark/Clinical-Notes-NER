@@ -20,7 +20,7 @@ class EntityModel(nn.Module):
     super(EntityModel, self).__init__()
     self.num_tag = num_tag
     self.bert = transformers.BertModel.from_pretrained(
-        "bert-base-uncased",
+        "emilyalsentzer/Bio_ClinicalBERT",
         return_dict = False
     )
     self.drop = nn.Dropout(0.3)
