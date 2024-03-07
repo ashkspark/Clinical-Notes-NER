@@ -1,4 +1,4 @@
-Project performed under my supervision by ![Pushkaraj Palnitkar](https://github.com/push44) during the course of his internship at Endeavor Health Advanced Analytics Team.
+Project performed under my supervision by [Pushkaraj Palnitkar](https://github.com/push44) during the course of his internship at Endeavor Health Advanced Analytics Team.
 
 
 # Clinical-Notes-NER
