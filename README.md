@@ -20,7 +20,7 @@ $pip install -r requirements.txt
 $python src/predict.py
 ```
 Enter your clinical note in terminal: ![Example clinical from MeDAL dataset](https://www.kaggle.com/xhlulu/medal-emnlp)
-[input](https://user-images.githubusercontent.com/61958160/127630915-40d8545d-c8d7-4fcf-a66f-add6f7e4964f.png)
+![input](https://user-images.githubusercontent.com/61958160/127630915-40d8545d-c8d7-4fcf-a66f-add6f7e4964f.png)
 
 Out will be displayed:
-[output](https://user-images.githubusercontent.com/61958160/127630955-0c3c0547-a5e2-4e6d-a19c-7368437b2415.png)
+![output](https://user-images.githubusercontent.com/61958160/127630955-0c3c0547-a5e2-4e6d-a19c-7368437b2415.png)
