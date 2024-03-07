@@ -4,7 +4,7 @@ Project performed under my supervision by [Pushkaraj Palnitkar](https://github.c
 # Clinical-Notes-NER
 Named entity recognition on clinical notes
 
-[medicalrecord](https://user-images.githubusercontent.com/61958160/126857163-d5fa33c0-a712-475a-8d35-78bdc71ea462.jpg)
+![medicalrecord](https://user-images.githubusercontent.com/61958160/126857163-d5fa33c0-a712-475a-8d35-78bdc71ea462.jpg)
 
 ### Instructions to run this project:
 Copy https project url from github green code button.<br>
