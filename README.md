@@ -1,6 +1,7 @@
+Developed a Named Entity Recognition (NER) algorithm pipeline for medical notes question/answering.
 Project performed under my supervision by [Pushkaraj Palnitkar](https://github.com/push44) during the course of his internship at Endeavor Health Advanced Analytics Team.
 
-
+EEH was merged with NorthShore University HealthSystem (NorthShore) in 2022 and created Endeavor Health.
 # Clinical-Notes-NER
 Named entity recognition on clinical notes
 
