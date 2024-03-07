@@ -1,3 +1,6 @@
+Project performed under my supervision by ![Pushkaraj Palnitkar](https://github.com/push44) during the course of his internship at Endeavor Health.
+
+
 # Clinical-Notes-NER
 Named entity recognition on clinical notes
 
